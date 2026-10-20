@@ -1,0 +1,6 @@
+{
+  "name": "Sunny Idea-to-ISBN Mentor",
+  "description": "Evaluate book categories, estimate sales velocity, optimize 7 backend keyword slots, and direct ISBN acquisition.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
