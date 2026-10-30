@@ -2057,6 +2057,7 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
                             <button
                               onClick={() => copyToClipboard(slot, index)}
                               className="text-slate-400 hover:text-amber-600 p-0.5"
+                              aria-label={`Copy keyword slot ${index + 1}`}
                             >
                               {copiedSlot === index ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                             </button>
@@ -2071,6 +2072,7 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
                           className={`w-full bg-sky-50/50 rounded-lg px-2.5 py-1 text-xs text-slate-800 font-medium focus:outline-none border ${
                             isOverLimit ? 'border-rose-400 bg-rose-50/50' : 'border-sky-100 focus:border-amber-400 focus:bg-white'
                           }`}
+                          aria-label={`Keyword slot ${index + 1}`}
                         />
                       </div>
                     );
