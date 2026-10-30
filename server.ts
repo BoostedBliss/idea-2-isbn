@@ -1,4 +1,5 @@
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -12,8 +13,15 @@ const port = Number(process.env.PORT) || 3000;
 
 app.use(express.json());
 
+// Rate limiter for AI endpoint to prevent abuse/billing exhaustion
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 requests per windowMs
+  message: { error: 'Too many requests from this IP, please try again after 15 minutes.' }
+});
+
 // API endpoint for AI Keyword Generation
-app.post('/api/generate-keywords', async (req, res) => {
+app.post('/api/generate-keywords', aiLimiter, async (req, res) => {
   try {
     const { categoryName, categoryPath, genre, audienceIntent } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
