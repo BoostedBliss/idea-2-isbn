@@ -842,12 +842,14 @@ export default function App() {
   }, [sandboxPrice, sandboxPrintCost]);
 
   const filteredCategories = useMemo(() => {
+    // ⚡ Bolt: Cache lowercased search query outside filter loop to prevent unnecessary re-evaluations
+    const searchQueryLower = searchQuery.toLowerCase();
     return NICHE_CATEGORIES.filter(cat => {
       const matchesGenre = selectedGenre === 'All' || cat.genre === selectedGenre;
       const matchesSearch =
-        cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        cat.path.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        cat.recommendedKeywords.some(k => k.toLowerCase().includes(searchQuery.toLowerCase()));
+        cat.name.toLowerCase().includes(searchQueryLower) ||
+        cat.path.toLowerCase().includes(searchQueryLower) ||
+        cat.recommendedKeywords.some(k => k.toLowerCase().includes(searchQueryLower));
       return matchesGenre && matchesSearch;
     });
   }, [selectedGenre, searchQuery]);
@@ -1294,10 +1296,12 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
   };
 
   const filteredGlossary = useMemo(() => {
+    // ⚡ Bolt: Cache lowercased search query outside filter loop to prevent unnecessary re-evaluations
+    const glossarySearchLower = glossarySearch.toLowerCase();
     return GLOSSARY_TERMS.filter(item =>
-      item.term.toLowerCase().includes(glossarySearch.toLowerCase()) ||
-      item.plainEnglish.toLowerCase().includes(glossarySearch.toLowerCase()) ||
-      item.dayOneTakeaway.toLowerCase().includes(glossarySearch.toLowerCase())
+      item.term.toLowerCase().includes(glossarySearchLower) ||
+      item.plainEnglish.toLowerCase().includes(glossarySearchLower) ||
+      item.dayOneTakeaway.toLowerCase().includes(glossarySearchLower)
     );
   }, [glossarySearch]);
 
