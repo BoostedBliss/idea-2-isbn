@@ -3224,6 +3224,7 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
               onClick={() => setIsRecentSidebarOpen(false)}
               className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-white text-xs font-bold"
               title="Close sidebar"
+              aria-label="Close recent searches sidebar"
             >
               ✕
             </button>
@@ -3299,6 +3300,7 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
               type="button"
               onClick={() => setIsVoiceApplicantModalOpen(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold p-1 rounded-lg"
+              aria-label="Close applicant portal modal"
             >
               ✕
             </button>
