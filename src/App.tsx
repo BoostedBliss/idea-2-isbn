@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useDeferredValue } from 'react';
 import {
   Search,
   BookOpen,
@@ -477,9 +477,11 @@ export default function App() {
   // Categories & Filtering
   const [selectedGenre, setSelectedGenre] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [selectedCategory, setSelectedCategory] = useState<KDPCategory>(NICHE_CATEGORIES[0]);
   const [selectedForKdp, setSelectedForKdp] = useState<KDPCategory[]>([NICHE_CATEGORIES[0], NICHE_CATEGORIES[1]]);
   const [customBsr, setCustomBsr] = useState<number>(12000);
+  const deferredCustomBsr = useDeferredValue(customBsr);
 
   // KDP 7 Backend Keyword Slots
   const [keywordSlots, setKeywordSlots] = useState<string[]>([
@@ -501,12 +503,15 @@ export default function App() {
 
   // Glossary Search
   const [glossarySearch, setGlossarySearch] = useState<string>('');
+  const deferredGlossarySearch = useDeferredValue(glossarySearch);
 
   // Pro Sandbox A/B testing & Pricing Sliders
   const [variantA, setVariantA] = useState<string>("Children's Emotional Learning (Picture Book)");
   const [variantB, setVariantB] = useState<string>("Cottagecore Herbalism (Sub-Culture Gift)");
   const [sandboxPrice, setSandboxPrice] = useState<number>(14.99);
   const [sandboxPrintCost, setSandboxPrintCost] = useState<number>(3.65);
+  const deferredSandboxPrice = useDeferredValue(sandboxPrice);
+  const deferredSandboxPrintCost = useDeferredValue(sandboxPrintCost);
   const [exportSuccess, setExportSuccess] = useState<'free' | 'paid' | null>(null);
 
   // ISBN Middleman Syndication State ($55.55 Pro / $77.77 Free)
@@ -837,13 +842,13 @@ export default function App() {
 
   // Pro Sandbox Net Margin per unit (Amazon 60% standard paperback royalty minus print cost)
   const sandboxNetMargin = useMemo(() => {
-    const net = (sandboxPrice * 0.60) - sandboxPrintCost;
+    const net = (deferredSandboxPrice * 0.60) - deferredSandboxPrintCost;
     return Math.max(0, Number(net.toFixed(2)));
-  }, [sandboxPrice, sandboxPrintCost]);
+  }, [deferredSandboxPrice, deferredSandboxPrintCost]);
 
   const filteredCategories = useMemo(() => {
     // ⚡ Bolt: Cache lowercased search query outside filter loop to prevent unnecessary re-evaluations
-    const searchQueryLower = searchQuery.toLowerCase();
+    const searchQueryLower = deferredSearchQuery.toLowerCase();
     return NICHE_CATEGORIES.filter(cat => {
       const matchesGenre = selectedGenre === 'All' || cat.genre === selectedGenre;
       const matchesSearch =
@@ -852,10 +857,10 @@ export default function App() {
         cat.recommendedKeywords.some(k => k.toLowerCase().includes(searchQueryLower));
       return matchesGenre && matchesSearch;
     });
-  }, [selectedGenre, searchQuery]);
+  }, [selectedGenre, deferredSearchQuery]);
 
   const estimatedSales = useMemo(() => {
-    const bsr = Math.max(1, customBsr);
+    const bsr = Math.max(1, deferredCustomBsr);
     let daily = 0;
     if (bsr <= 5) daily = 3500;
     else if (bsr <= 10) daily = 2000;
@@ -873,11 +878,11 @@ export default function App() {
       monthly: daily * 30,
       royaltiesAt499: (daily * 30 * 4.99 * 0.7).toFixed(0),
     };
-  }, [customBsr]);
+  }, [deferredCustomBsr]);
 
   // 30-day projection calculation
   const projectionData = useMemo(() => {
-    const baseBsr = Math.max(1, customBsr);
+    const baseBsr = Math.max(1, deferredCustomBsr);
     const data = [];
     let cumulative = 0;
     for (let day = 1; day <= 30; day++) {
@@ -909,7 +914,7 @@ export default function App() {
       });
     }
     return data;
-  }, [customBsr]);
+  }, [deferredCustomBsr]);
 
   const thirtyDayCumulative = useMemo(() => {
     if (!projectionData.length) return 0;
@@ -918,7 +923,7 @@ export default function App() {
 
   // Pro Sandbox 30-Day Royalties projection based on dynamic Price & Print Cost sliders
   const proProjectionData = useMemo(() => {
-    const baseBsr = Math.max(1, customBsr);
+    const baseBsr = Math.max(1, deferredCustomBsr);
     const data = [];
     let cumulative = 0;
     for (let day = 1; day <= 30; day++) {
@@ -950,7 +955,7 @@ export default function App() {
       });
     }
     return data;
-  }, [customBsr, sandboxNetMargin]);
+  }, [deferredCustomBsr, sandboxNetMargin]);
 
   const proThirtyDayCumulative = useMemo(() => {
     if (!proProjectionData.length) return 0;
@@ -1297,13 +1302,13 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
 
   const filteredGlossary = useMemo(() => {
     // ⚡ Bolt: Cache lowercased search query outside filter loop to prevent unnecessary re-evaluations
-    const glossarySearchLower = glossarySearch.toLowerCase();
+    const glossarySearchLower = deferredGlossarySearch.toLowerCase();
     return GLOSSARY_TERMS.filter(item =>
       item.term.toLowerCase().includes(glossarySearchLower) ||
       item.plainEnglish.toLowerCase().includes(glossarySearchLower) ||
       item.dayOneTakeaway.toLowerCase().includes(glossarySearchLower)
     );
-  }, [glossarySearch]);
+  }, [deferredGlossarySearch]);
 
   const getOpportunityBadge = (opp: KDPCategory['opportunity']) => {
     switch (opp) {
