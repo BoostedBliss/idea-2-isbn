@@ -56,6 +56,21 @@ import {
   Tooltip
 } from 'recharts';
 
+// Pure function for BSR to daily sales mapping to avoid duplicated logic in useMemo
+export const getDailySalesFromBsr = (bsr: number): number => {
+  if (bsr <= 5) return 3500;
+  if (bsr <= 10) return 2000;
+  if (bsr <= 50) return 450;
+  if (bsr <= 100) return 220;
+  if (bsr <= 500) return 75;
+  if (bsr <= 1000) return 40;
+  if (bsr <= 5000) return 18;
+  if (bsr <= 10000) return 10;
+  if (bsr <= 20000) return 5;
+  if (bsr <= 50000) return 2;
+  return 1;
+};
+
 export interface SeasonalMonth {
   month: string;
   demand: number; // 0-100
@@ -856,18 +871,7 @@ export default function App() {
 
   const estimatedSales = useMemo(() => {
     const bsr = Math.max(1, customBsr);
-    let daily = 0;
-    if (bsr <= 5) daily = 3500;
-    else if (bsr <= 10) daily = 2000;
-    else if (bsr <= 50) daily = 450;
-    else if (bsr <= 100) daily = 220;
-    else if (bsr <= 500) daily = 75;
-    else if (bsr <= 1000) daily = 40;
-    else if (bsr <= 5000) daily = 18;
-    else if (bsr <= 10000) daily = 10;
-    else if (bsr <= 20000) daily = 5;
-    else if (bsr <= 50000) daily = 2;
-    else daily = 1;
+    const daily = getDailySalesFromBsr(bsr);
     return {
       daily,
       monthly: daily * 30,
@@ -883,18 +887,7 @@ export default function App() {
     for (let day = 1; day <= 30; day++) {
       const fluctuation = Math.sin((day / 30) * Math.PI * 4) * 0.10 + Math.cos((day / 15) * Math.PI) * 0.04;
       const dayBsr = Math.max(1, Math.round(baseBsr * (1 + fluctuation)));
-      let daily = 0;
-      if (dayBsr <= 5) daily = 3500;
-      else if (dayBsr <= 10) daily = 2000;
-      else if (dayBsr <= 50) daily = 450;
-      else if (dayBsr <= 100) daily = 220;
-      else if (dayBsr <= 500) daily = 75;
-      else if (dayBsr <= 1000) daily = 40;
-      else if (dayBsr <= 5000) daily = 18;
-      else if (dayBsr <= 10000) daily = 10;
-      else if (dayBsr <= 20000) daily = 5;
-      else if (dayBsr <= 50000) daily = 2;
-      else daily = 1;
+      const daily = getDailySalesFromBsr(dayBsr);
 
       const dailyRoyalty = Number((daily * 4.99 * 0.7).toFixed(1));
       cumulative += dailyRoyalty;
@@ -924,18 +917,7 @@ export default function App() {
     for (let day = 1; day <= 30; day++) {
       const fluctuation = Math.sin((day / 30) * Math.PI * 4) * 0.10 + Math.cos((day / 15) * Math.PI) * 0.04;
       const dayBsr = Math.max(1, Math.round(baseBsr * (1 + fluctuation)));
-      let daily = 0;
-      if (dayBsr <= 5) daily = 3500;
-      else if (dayBsr <= 10) daily = 2000;
-      else if (dayBsr <= 50) daily = 450;
-      else if (dayBsr <= 100) daily = 220;
-      else if (dayBsr <= 500) daily = 75;
-      else if (dayBsr <= 1000) daily = 40;
-      else if (dayBsr <= 5000) daily = 18;
-      else if (dayBsr <= 10000) daily = 10;
-      else if (dayBsr <= 20000) daily = 5;
-      else if (dayBsr <= 50000) daily = 2;
-      else daily = 1;
+      const daily = getDailySalesFromBsr(dayBsr);
 
       const dailyRoyalty = Number((daily * sandboxNetMargin).toFixed(2));
       cumulative += dailyRoyalty;
