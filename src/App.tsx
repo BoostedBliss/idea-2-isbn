@@ -3224,6 +3224,7 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
               onClick={() => setIsRecentSidebarOpen(false)}
               className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-white text-xs font-bold"
               title="Close sidebar"
+              aria-label="Close sidebar"
             >
               ✕
             </button>
@@ -3299,6 +3300,7 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
               type="button"
               onClick={() => setIsVoiceApplicantModalOpen(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold p-1 rounded-lg"
+              aria-label="Close applicant portal"
             >
               ✕
             </button>
@@ -3326,8 +3328,9 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
             ) : (
               <form onSubmit={handleSubmitVoiceApplication} className="space-y-3.5 mt-3 text-xs">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Full Name / Stage Name *</label>
+                  <label htmlFor="applicant-name" className="font-bold text-slate-700 block mb-1">Full Name / Stage Name *</label>
                   <input
+                    id="applicant-name"
                     type="text"
                     required
                     value={applicantFormData.name}
@@ -3338,8 +3341,9 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Email Address *</label>
+                  <label htmlFor="applicant-email" className="font-bold text-slate-700 block mb-1">Email Address *</label>
                   <input
+                    id="applicant-email"
                     type="email"
                     required
                     value={applicantFormData.email}
@@ -3351,8 +3355,9 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Vocal Specialty</label>
+                    <label htmlFor="applicant-vocal" className="font-bold text-slate-700 block mb-1">Vocal Specialty</label>
                     <select
+                      id="applicant-vocal"
                       value={applicantFormData.vocalStyle}
                       onChange={(e) => setApplicantFormData({ ...applicantFormData, vocalStyle: e.target.value })}
                       className="w-full bg-sky-50/70 border border-sky-200 rounded-xl px-2.5 py-2 text-xs focus:ring-2 focus:ring-purple-400 focus:outline-none"
@@ -3364,8 +3369,9 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
                     </select>
                   </div>
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Rate Per Finished Hour ($)</label>
+                    <label htmlFor="applicant-rate" className="font-bold text-slate-700 block mb-1">Rate Per Finished Hour ($)</label>
                     <input
+                      id="applicant-rate"
                       type="number"
                       min="40"
                       max="350"
@@ -3377,8 +3383,9 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Home Studio Equipment & Noise Floor</label>
+                  <label htmlFor="applicant-studio" className="font-bold text-slate-700 block mb-1">Home Studio Equipment & Noise Floor</label>
                   <input
+                    id="applicant-studio"
                     type="text"
                     value={applicantFormData.studioMic}
                     onChange={(e) => setApplicantFormData({ ...applicantFormData, studioMic: e.target.value })}
@@ -3388,8 +3395,9 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Sample Demo Reel URL</label>
+                  <label htmlFor="applicant-demo" className="font-bold text-slate-700 block mb-1">Sample Demo Reel URL</label>
                   <input
+                    id="applicant-demo"
                     type="url"
                     value={applicantFormData.sampleLink}
                     onChange={(e) => setApplicantFormData({ ...applicantFormData, sampleLink: e.target.value })}
