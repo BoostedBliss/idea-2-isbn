@@ -1,3 +1,6 @@
 ## $(date +%Y-%m-%d) - Added missing ARIA labels to Keyword Slot Elements
 **Learning:** Found an accessibility issue pattern specific to this app's components: icon-only buttons (like the Copy button in the keyword slots) and their associated input fields often lack programmatic labels (`aria-label` or `aria-labelledby`). This makes them completely opaque to screen readers.
 **Action:** When evaluating forms or interactive lists in this app, proactively check that every input and icon-only button has a descriptive `aria-label` that includes context (like the loop index) if applicable.
+## $(date +%Y-%m-%d) - Added missing ARIA labels and form label associations to Voice Talent Applicant Portal Modal
+**Learning:** Found an accessibility issue pattern specific to this app's components: icon-only buttons (like the Close button in the modal) lack programmatic labels (`aria-label`). Form fields also lack `htmlFor` and `id` bindings between `<label>` and `<input>`/`<select>` tags. This makes forms difficult for screen readers to parse and reduces clickable area for all users.
+**Action:** When evaluating forms or interactive lists in this app, proactively check that every input has an associated `id` and its label has a matching `htmlFor`, and that icon-only buttons have descriptive `aria-label`s.
