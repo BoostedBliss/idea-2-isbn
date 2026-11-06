@@ -24,11 +24,21 @@ const aiLimiter = rateLimit({
 app.post('/api/generate-keywords', aiLimiter, async (req, res) => {
   try {
     const { categoryName, categoryPath, genre, audienceIntent } = req.body;
+
+    // Security: Input validation to prevent prompt injection and payload abuse
+    const isValidString = (str: any) => typeof str === 'string' && str.length <= 200;
+    if (!isValidString(categoryName) || !isValidString(categoryPath) || !isValidString(genre)) {
+      return res.status(400).json({ error: 'Invalid input parameters' });
+    }
+    if (audienceIntent !== undefined && !isValidString(audienceIntent)) {
+      return res.status(400).json({ error: 'Invalid input parameters' });
+    }
+
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return res.status(400).json({
-        error: 'GEMINI_API_KEY environment variable is not configured',
+      return res.status(500).json({
+        error: 'AI service configuration error', // Sanitized error message
         fallback: true
       });
     }
@@ -82,7 +92,8 @@ Return ONLY a JSON array of 7 strings formatted like:
     return res.json({ keywords });
   } catch (err: any) {
     console.error('Error generating keywords with Gemini:', err);
-    return res.status(500).json({ error: err.message || 'Gemini API generation error' });
+    // Security: Do not leak external service error details to client
+    return res.status(500).json({ error: 'Failed to generate keywords. Please try again later.' });
   }
 });
 
