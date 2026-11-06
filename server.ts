@@ -20,10 +20,20 @@ const aiLimiter = rateLimit({
   message: { error: 'Too many requests from this IP, please try again after 15 minutes.' }
 });
 
+// ⚡ Bolt: Cache expensive API call results to improve speed and reduce Gemini costs
+const keywordCache = new Map<string, string[]>();
+
 // API endpoint for AI Keyword Generation
 app.post('/api/generate-keywords', aiLimiter, async (req, res) => {
   try {
     const { categoryName, categoryPath, genre, audienceIntent } = req.body;
+
+    // ⚡ Bolt: Return cached response if available to skip slow AI generation
+    const cacheKey = [categoryName, categoryPath, genre, audienceIntent].join('|');
+    if (keywordCache.has(cacheKey)) {
+      return res.json({ keywords: keywordCache.get(cacheKey) });
+    }
+
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -78,6 +88,11 @@ Return ONLY a JSON array of 7 strings formatted like:
       .map(k => String(k).replace(/[,"']/g, '').trim().slice(0, 50))
       .filter(Boolean)
       .slice(0, 7);
+
+    // ⚡ Bolt: Save successful generation to cache
+    if (keywords.length > 0) {
+      keywordCache.set(cacheKey, keywords);
+    }
 
     return res.json({ keywords });
   } catch (err: any) {
