@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useDeferredValue } from 'react';
 import {
   Search,
   BookOpen,
@@ -477,6 +477,8 @@ export default function App() {
   // Categories & Filtering
   const [selectedGenre, setSelectedGenre] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  // ⚡ Bolt: Defer search query for heavy category filtering
+  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [selectedCategory, setSelectedCategory] = useState<KDPCategory>(NICHE_CATEGORIES[0]);
   const [selectedForKdp, setSelectedForKdp] = useState<KDPCategory[]>([NICHE_CATEGORIES[0], NICHE_CATEGORIES[1]]);
   const [customBsr, setCustomBsr] = useState<number>(12000);
@@ -501,6 +503,8 @@ export default function App() {
 
   // Glossary Search
   const [glossarySearch, setGlossarySearch] = useState<string>('');
+  // ⚡ Bolt: Defer glossary search for filtering
+  const deferredGlossarySearch = useDeferredValue(glossarySearch);
 
   // Pro Sandbox A/B testing & Pricing Sliders
   const [variantA, setVariantA] = useState<string>("Children's Emotional Learning (Picture Book)");
@@ -843,7 +847,7 @@ export default function App() {
 
   const filteredCategories = useMemo(() => {
     // ⚡ Bolt: Cache lowercased search query outside filter loop to prevent unnecessary re-evaluations
-    const searchQueryLower = searchQuery.toLowerCase();
+    const searchQueryLower = deferredSearchQuery.toLowerCase();
     return NICHE_CATEGORIES.filter(cat => {
       const matchesGenre = selectedGenre === 'All' || cat.genre === selectedGenre;
       const matchesSearch =
@@ -852,7 +856,7 @@ export default function App() {
         cat.recommendedKeywords.some(k => k.toLowerCase().includes(searchQueryLower));
       return matchesGenre && matchesSearch;
     });
-  }, [selectedGenre, searchQuery]);
+  }, [selectedGenre, deferredSearchQuery]);
 
   const estimatedSales = useMemo(() => {
     const bsr = Math.max(1, customBsr);
@@ -1297,13 +1301,13 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
 
   const filteredGlossary = useMemo(() => {
     // ⚡ Bolt: Cache lowercased search query outside filter loop to prevent unnecessary re-evaluations
-    const glossarySearchLower = glossarySearch.toLowerCase();
+    const glossarySearchLower = deferredGlossarySearch.toLowerCase();
     return GLOSSARY_TERMS.filter(item =>
       item.term.toLowerCase().includes(glossarySearchLower) ||
       item.plainEnglish.toLowerCase().includes(glossarySearchLower) ||
       item.dayOneTakeaway.toLowerCase().includes(glossarySearchLower)
     );
-  }, [glossarySearch]);
+  }, [deferredGlossarySearch]);
 
   const getOpportunityBadge = (opp: KDPCategory['opportunity']) => {
     switch (opp) {
