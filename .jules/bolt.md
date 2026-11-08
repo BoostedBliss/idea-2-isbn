@@ -1,0 +1,3 @@
+## 2024-05-15 - React 19 useDeferredValue for large component trees
+**Learning:** In exceptionally large React components (like `src/App.tsx`), typing in an un-debounced/un-deferred text input that filters a large list can cause significant main thread blocking and janky typing experience because every keystroke triggers a synchronous re-render of the entire filtered list.
+**Action:** Use React 19's `useDeferredValue` on the search query state before using it in the `useMemo` filter block. This allows React to prioritize the input state update (keeping typing smooth) and defer the expensive filtering and re-rendering of the list until the main thread is idle.
