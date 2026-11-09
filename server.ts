@@ -20,10 +20,20 @@ const aiLimiter = rateLimit({
   message: { error: 'Too many requests from this IP, please try again after 15 minutes.' }
 });
 
+// In-memory cache for expensive Gemini API responses to optimize performance
+const aiCache = new Map<string, string[]>();
+
 // API endpoint for AI Keyword Generation
 app.post('/api/generate-keywords', aiLimiter, async (req, res) => {
   try {
     const { categoryName, categoryPath, genre, audienceIntent } = req.body;
+
+    // Create a cache key from the request body
+    const cacheKey = JSON.stringify({ categoryName, categoryPath, genre, audienceIntent });
+    if (aiCache.has(cacheKey)) {
+      console.log('Serving keywords from cache for:', cacheKey);
+      return res.json({ keywords: aiCache.get(cacheKey) });
+    }
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -78,6 +88,9 @@ Return ONLY a JSON array of 7 strings formatted like:
       .map(k => String(k).replace(/[,"']/g, '').trim().slice(0, 50))
       .filter(Boolean)
       .slice(0, 7);
+
+    // Save to cache before returning
+    aiCache.set(cacheKey, keywords);
 
     return res.json({ keywords });
   } catch (err: any) {
