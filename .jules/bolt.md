@@ -1,0 +1,3 @@
+## 2024-05-24 - React 19 `useDeferredValue` for large component debouncing
+**Learning:** In exceptionally large React 19 components (like `App.tsx` with 3400+ lines), text input filtering can block the main thread on every keystroke, causing typing lag. Standard memoization isn't enough because the state update itself triggers a massive render.
+**Action:** Use React 19's native `useDeferredValue` on the search query state before passing it to the filter's `useMemo`. This allows the text input to update immediately while deferring the heavy filtering and re-rendering to the background, effectively debouncing the UI without needing external libraries.
