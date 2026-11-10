@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useDeferredValue } from 'react';
 import {
   Search,
   BookOpen,
@@ -841,9 +841,13 @@ export default function App() {
     return Math.max(0, Number(net.toFixed(2)));
   }, [sandboxPrice, sandboxPrintCost]);
 
+  // ⚡ Bolt: Use useDeferredValue for text inputs to prevent typing lag and unblock the UI thread
+  // during large component re-renders (natively supported in React 19).
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+
   const filteredCategories = useMemo(() => {
     // ⚡ Bolt: Cache lowercased search query outside filter loop to prevent unnecessary re-evaluations
-    const searchQueryLower = searchQuery.toLowerCase();
+    const searchQueryLower = deferredSearchQuery.toLowerCase();
     return NICHE_CATEGORIES.filter(cat => {
       const matchesGenre = selectedGenre === 'All' || cat.genre === selectedGenre;
       const matchesSearch =
@@ -852,7 +856,7 @@ export default function App() {
         cat.recommendedKeywords.some(k => k.toLowerCase().includes(searchQueryLower));
       return matchesGenre && matchesSearch;
     });
-  }, [selectedGenre, searchQuery]);
+  }, [selectedGenre, deferredSearchQuery]);
 
   const estimatedSales = useMemo(() => {
     const bsr = Math.max(1, customBsr);
@@ -1295,15 +1299,17 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
     }, 2200);
   };
 
+  const deferredGlossarySearch = useDeferredValue(glossarySearch);
+
   const filteredGlossary = useMemo(() => {
     // ⚡ Bolt: Cache lowercased search query outside filter loop to prevent unnecessary re-evaluations
-    const glossarySearchLower = glossarySearch.toLowerCase();
+    const glossarySearchLower = deferredGlossarySearch.toLowerCase();
     return GLOSSARY_TERMS.filter(item =>
       item.term.toLowerCase().includes(glossarySearchLower) ||
       item.plainEnglish.toLowerCase().includes(glossarySearchLower) ||
       item.dayOneTakeaway.toLowerCase().includes(glossarySearchLower)
     );
-  }, [glossarySearch]);
+  }, [deferredGlossarySearch]);
 
   const getOpportunityBadge = (opp: KDPCategory['opportunity']) => {
     switch (opp) {
