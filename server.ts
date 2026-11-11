@@ -20,10 +20,20 @@ const aiLimiter = rateLimit({
   message: { error: 'Too many requests from this IP, please try again after 15 minutes.' }
 });
 
+// Cache for Gemini API responses to prevent redundant calls and reduce costs
+const keywordCache = new Map<string, { keywords: string[], timestamp: number }>();
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+
 // API endpoint for AI Keyword Generation
 app.post('/api/generate-keywords', aiLimiter, async (req, res) => {
   try {
     const { categoryName, categoryPath, genre, audienceIntent } = req.body;
+    const cacheKey = JSON.stringify({ categoryName, categoryPath, genre, audienceIntent });
+
+    const cached = keywordCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return res.json({ keywords: cached.keywords });
+    }
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -78,6 +88,8 @@ Return ONLY a JSON array of 7 strings formatted like:
       .map(k => String(k).replace(/[,"']/g, '').trim().slice(0, 50))
       .filter(Boolean)
       .slice(0, 7);
+
+    keywordCache.set(cacheKey, { keywords, timestamp: Date.now() });
 
     return res.json({ keywords });
   } catch (err: any) {
