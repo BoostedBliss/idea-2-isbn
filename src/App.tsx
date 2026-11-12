@@ -3299,6 +3299,7 @@ ${keywordSlots.map((slot, i) => `Slot ${i + 1} [${slot.length}/50 chars]: ${slot
               type="button"
               onClick={() => setIsVoiceApplicantModalOpen(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold p-1 rounded-lg"
+              aria-label="Close audition portal"
             >
               ✕
             </button>
